@@ -1,0 +1,238 @@
+@url = http://192.168.18.100:8000/api
+@token = 941|Evmg0EjwxkXIU384kIuwzdQQ7dl3krMCHQJUaWjq20591ce6
+### ===
+POST {{url}}/login
+Content-Type: application/json
+ API
+{
+    "username" : "ibu3",
+    "password" : "password123",
+    "tenantID" : "ksp_spr",
+    "clientType" : "CUSTOMER"
+}
+
+### ===
+POST {{url}}/change-password
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "old_password" : "password123",
+    "new_password" : "password123!"
+}
+
+### ===
+GET {{url}}/tenants
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+POST {{url}}/create-reservation
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "destinationService" : "001",
+    "reason" : "Menjenguk",
+    "branchId" : "001",
+    "attendAtStart" : "2023-09-18 12:00:00.048+07",
+    "attendAtEnd" : "2023-09-18 15:00:00.048+07",
+    "time" : "0100-1900"
+}
+
+###
+GET {{url}}/reservation/1697548721385241143
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/office
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/saving
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/saving/product-type
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/saving/00102020000009
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/saving/history/00102020000009
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+POST {{url}}/saving
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "productType" : "02",
+    "currentBalance" : "230000"
+}
+
+### ===
+POST {{url}}/saving/deposit
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "savingId" : "0980980879987",
+    "amount" : "1000000",
+    "paymentMethodId" : "00105000000476",
+    "recipient" : "Namaaaa"
+}
+
+### ===
+GET {{url}}/loan
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/loan/00104010000459
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/loan/product-type
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/loan/bill/00104010000745
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/loan/now/00104010000745
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+POST {{url}}/loan
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "productType" : "02",
+    "currentBalance" : "200000",
+    "period" : "4"
+}
+
+### ===
+POST {{url}}/loan/repay
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "loanId" : "0980980879987",
+    "amount" : "1000000",
+    "paymentMethodId" : "01299",
+    "recipient" : "DANA"
+}
+
+### 
+POST {{url}}/loan/topup
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "loanId" : "0980980879987",
+    "amount" : "1000000",
+    "reason" : "Halooo"
+}
+
+### ===
+GET {{url}}/deposit
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/deposit/00103120000050
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/deposit/product-type
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+POST {{url}}/deposit
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "productType" : "03",
+    "currentBalance" : "200000"
+}
+
+### ===
+GET {{url}}/notification
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/notification/1699001478869365151
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET {{url}}/image
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### ===
+GET http://192.168.18.100:8000/images/2023-10-18_051920_BPR_Kreasi_Nusantara_Dev.jpeg
+
+### ===
+GET {{url}}/payment-method/1/00102010000456
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# loan : 00104010000867
+# saving : 00102010000456
+
+### ===
+GET {{url}}/tenant/900001
+
+### ===
+GET {{url}}/hehe
+
+### ===
+POST {{url}}/create
+Content-Type: application/json
+
+{
+    "data": [
+    {
+        "public_id": "8",
+        "name": "KSP Sinar Mas Kalimantan API",
+        "username": "jaya-abadi",
+        "token": "",
+        "Kode AO": "1",
+        "database": "ksp_sinarmas_kalimantan",
+        "pwd1": "jaya-abadi",
+        "pwd2": "$2y$04$Mfwjc1LgRhtU0Z2aP1Oewu6BFSjoHKbsV9Vrd1i01\/ovNSK5NT6Gm"
+    }
+]
+}
+
+### 
+POST https://dots-api-test.dotsco.re/auth/login
+Content-Type: application/json
+
+{
+    "username": "jaya-abadi",
+    "password": "jaya-abadi",
+    "tenantID": "ksp_ja",
+    "clientType": "API"
+}
