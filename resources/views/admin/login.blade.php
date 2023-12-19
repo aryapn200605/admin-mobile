@@ -33,7 +33,6 @@
                         </div>
                     </div>
                     <hr class="text-center">
-                    </hr>
                     <div class="row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary btn-block">Login</button>

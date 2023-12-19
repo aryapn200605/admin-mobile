@@ -17,14 +17,21 @@ class ProductImageApiController extends BaseController
 
         $imageData = [];
 
-        $url = 'http://192.168.8.143:8000/';
-
         foreach ($datas as $data) {
             $imageData[] = [
                 'id' => $data->id,
                 'title' => $data->title,
                 'description' => $data->description,
                 'imageUrl' => $data->name,
+            ];
+        }
+
+        if (!$imageData) {
+            $imageData = [
+                'id' => 1,
+                'title' => 'Images',
+                'description' => '<h1>Hello World</h1>',
+                'imageUrl' => 'images/image_skeleton.png'
             ];
         }
 

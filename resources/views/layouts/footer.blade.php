@@ -46,7 +46,7 @@
 {{-- Tiny Mce --}}
 <script src='https://cdn.tiny.cloud/1/gja082pi5uvjftqtfbcn2oshrt4lj8kmcwpyeaymv602uvo4/tinymce/4/tinymce.min.js'></script>
 <!-- Summernote -->
-<script src="{{ asset('plugins/summernote/summernote-bs4.min.js') }}"></script>
+<script src="{{ asset('lte/plugins/summernote/summernote-bs4.min.js') }}"></script>
 
 <script>
     $("#datatable")

@@ -29,7 +29,6 @@ use function PHPUnit\Framework\returnSelf;
 // });
 
 Route::controller(AuthApiController::class)->group(function () {
-
     Route::post('login', 'login');
 });
 
@@ -39,9 +38,12 @@ Route::get('hehe', function() {
     return time() + 86400;
 });
 
-Route::post('create', [ReservationApiController::class, 'createCorporateUser']);
+Route::get('topup-reason', [TenantApiController::class, 'topupReason']);
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::post('create', [ReservationApiController::class, 'createCorporateUser']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('check-token', );
 
     Route::post('change-password', [AuthApiController::class, 'changePassword']);
 

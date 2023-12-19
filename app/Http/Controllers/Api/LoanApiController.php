@@ -23,11 +23,11 @@ class LoanApiController extends BaseController
         $dsn = $tenant->core_database_dsn;
 
         $data = $this->sqlServerConnection($dsn)->table('crdmaster')
-        ->select("crdmaster.norekcrd", "crdmaster.cif", "crdmaster.bakidebet", "crd_setup.kodeprodukcrd", "crd_setup.namafull")
-        ->where("cif", $customerId)
-        ->where("stsrekcrd", 1)
-        ->join("crd_setup", "crd_setup.kodeprodukcrd", "=", "crdmaster.kodeprodukcrd")
-        ->get();
+            ->select("crdmaster.norekcrd", "crdmaster.cif", "crdmaster.bakidebet", "crd_setup.kodeprodukcrd", "crd_setup.namafull")
+            ->where("cif", $customerId)
+            ->where("stsrekcrd", 1)
+            ->join("crd_setup", "crd_setup.kodeprodukcrd", "=", "crdmaster.kodeprodukcrd")
+            ->get();
 
         // if (!$data) {
         //     return $this->sendResponse('Failed', "Failed");
@@ -55,13 +55,13 @@ class LoanApiController extends BaseController
         $customerId = $user->customer_id;
         $tenant = TenantsModel::where('id', $user->tenant_id)->first();
         $dsn = $tenant->core_database_dsn;
-        
+
         $data = $this->sqlServerConnection($dsn)->table('crdmaster')
-        ->select("crdmaster.norekcrd", "crdmaster.cif", "crdmaster.bakidebet", "crd_setup.kodeprodukcrd", "crd_setup.namafull")
-        ->where("cif", $customerId)
-        ->where("norekcrd", $id)
-        ->join("crd_setup", "crd_setup.kodeprodukcrd", "=", "crdmaster.kodeprodukcrd")
-        ->first();
+            ->select("crdmaster.norekcrd", "crdmaster.cif", "crdmaster.bakidebet", "crd_setup.kodeprodukcrd", "crd_setup.namafull")
+            ->where("cif", $customerId)
+            ->where("norekcrd", $id)
+            ->join("crd_setup", "crd_setup.kodeprodukcrd", "=", "crdmaster.kodeprodukcrd")
+            ->first();
 
         $transformedData =  [
             'id' => $data->norekcrd,
@@ -80,35 +80,23 @@ class LoanApiController extends BaseController
     {
         $user = Auth::user();
 
-        $customerId = $user->customer_id;
         $tenant = TenantsModel::where('id', $user->tenant_id)->first();
         $dsn = $tenant->core_database_dsn;
-        
-        $data = $this->sqlServerConnection($dsn)->table('rps')
-        ->select("norekcrd","totalangsuran","periode","tagpokok","tagbunga","tagdenda","byrpokok","byrbunga","byrdenda","tglangsuran","tglbyr")
-        ->where("cif", $customerId)
-        ->where("norekcrd", $id)
-        // ->where(function ($query) {
-        //     $query->where('byrpokok', '<', 'tagpokok')
-        //         ->orWhere('byrbunga', '<', 'tagbunga')
-        //         ->orWhere('byrdenda', '<', 'tagdenda');
-        // })
-        ->where('tglangsuran', '<=', function ($subquery) {
-            $subquery->select('tanggal2')
-                ->from('reffsys')
-                ->where('kode1', 'TGL');
-        })
-        ->get();
+        $cdTrxArray = [410, 411, 412, 420, 421, 422];
+
+        $data = $this->sqlServerConnection($dsn)->table('history_crd')
+            ->where("noacc", $id)
+            ->whereIn('cd_trx1', $cdTrxArray)
+            ->orderBy('create_date')
+            ->get();
 
         $transformedData = $data->map(function ($item) {
             return [
-                'term' => $item->periode,
-                'amount' => $item->totalangsuran,
-                'loanID' => $item->norekcrd,
-                'principalAmount' => $item->tagpokok,
-                'interestAmount' => $item->tagbunga,
-                'penaltyAmount' => $item->tagdenda,
-                'repaymentDate' => date('d-m-Y', strtotime($item->tglbyr))
+                'type' => $item->tipe,
+                'amount' => $item->nominal,
+                'description' => $item->keterangan,
+                'loanID' => $item->noacc,
+                'repaymentDate' => $item->tgltrx
             ];
         });
 
@@ -125,29 +113,108 @@ class LoanApiController extends BaseController
         $customerId = $user->customer_id;
         $tenant = TenantsModel::where('id', $user->tenant_id)->first();
         $dsn = $tenant->core_database_dsn;
-        
-        $data = $this->sqlServerConnection($dsn)->table('rps')
-        ->select("norekcrd","totalangsuran","periode","tagpokok","tagbunga","tagdenda","byrpokok","byrbunga","byrdenda","tglangsuran","tglbyr")
-        ->where("cif", $customerId)
-        ->where("norekcrd", $id)
-        ->get();
 
-        $transformedData = $data->map(function ($item) {
-            return [
-                'term' => $item->periode,
-                'amount' => $this->formatNumber($item->totalangsuran),
-                'loanID' => $item->norekcrd,
-                'principalAmount' => $this->formatNumber($item->tagpokok),
-                'interestAmount' => $this->formatNumber($item->tagbunga),
-                'penaltyAmount' => $this->formatNumber($item->tagdenda),
-                'repaymentDate' => (intval(date("Y", strtotime($item->tglbyr))) < 2000) ? "-" : date("d-m-Y", strtotime($item->tglbyr))
-            ];
-        });
+        $data = $this->sqlServerConnection($dsn)->table('rps')
+            ->select("norekcrd", "totalangsuran", "periode", "tagpokok", "tagbunga", "tagdenda", "byrpokok", "byrbunga", "byrdenda", "tglangsuran", "tglbyr")
+            ->where("cif", $customerId)
+            ->where("norekcrd", $id)
+            ->where(function ($query) {
+                $query->orWhereRaw('tagbunga > byrbunga')
+                    ->orWhereRaw('tagpokok > byrpokok');
+            })
+            ->get();
+
+            $transformedData = $data->map(function ($item) {
+                $total = $item->tagpokok - $item->byrpokok + $item->tagbunga - $item->byrbunga + $item->tagdenda - $item->byrdenda;
+                return [
+                    $item->periode,
+                    $item->tglangsuran,
+                    $this->formatNumber($item->tagpokok - $item->byrpokok),
+                    $this->formatNumber($item->tagbunga - $item->byrbunga),
+                    $this->formatNumber($item->tagdenda - $item->byrdenda),
+                    $this->formatNumber($total),
+                ];
+            })->filter()->values();
 
         $originalArray = json_decode($transformedData, true);
 
         return $this->sendResponse($originalArray, 'Loan successfully');
     }
+
+    // public function findLoanRepaymentScheduleByLoanID(String $id): JsonResponse
+    // {
+    //     $user = Auth::user();
+
+    //     $customerId = $user->customer_id;
+    //     $tenant = TenantsModel::where('id', $user->tenant_id)->first();
+    //     $dsn = $tenant->core_database_dsn;
+
+    //     $data = $this->sqlServerConnection($dsn)->table('rps')
+    //         ->select("norekcrd", "totalangsuran", "periode", "tagpokok", "tagbunga", "tagdenda", "byrpokok", "byrbunga", "byrdenda", "tglangsuran", "tglbyr")
+    //         ->where("cif", $customerId)
+    //         ->where("norekcrd", $id)
+    //         // ->where(function ($query) {
+    //         //     $query->where('byrpokok', '<', 'tagpokok')
+    //         //         ->orWhere('byrbunga', '<', 'tagbunga')
+    //         //         ->orWhere('byrdenda', '<', 'tagdenda');
+    //         // })
+    //         ->where('tglangsuran', '<=', function ($subquery) {
+    //             $subquery->select('tanggal2')
+    //                 ->from('reffsys')
+    //                 ->where('kode1', 'TGL');
+    //         })
+    //         ->get();
+
+    //     $transformedData = $data->map(function ($item) {
+    //         return [
+    //             'term' => $item->periode,
+    //             'amount' => $item->totalangsuran,
+    //             'loanID' => $item->norekcrd,
+    //             'principalAmount' => $item->tagpokok,
+    //             'interestAmount' => $item->tagbunga,
+    //             'penaltyAmount' => $item->tagdenda,
+    //             'repaymentDate' => date('d-m-Y', strtotime($item->tglbyr))
+    //         ];
+    //     });
+
+    //     $originalArray = json_decode($transformedData, true);
+    //     $reversedArray = array_reverse($originalArray);
+
+    //     return $this->sendResponse($reversedArray, 'Loan successfully');
+    // }
+
+    // public function findLoanRepaymentScheduleUpcoming(String $id): JsonResponse
+    // {
+    //     $user = Auth::user();
+
+    //     $customerId = $user->customer_id;
+    //     $tenant = TenantsModel::where('id', $user->tenant_id)->first();
+    //     $dsn = $tenant->core_database_dsn;
+
+    //     $data = $this->sqlServerConnection($dsn)->table('rps')
+    //         ->select("norekcrd", "totalangsuran", "periode", "tagpokok", "tagbunga", "tagdenda", "byrpokok", "byrbunga", "byrdenda", "tglangsuran", "tglbyr")
+    //         ->where("cif", $customerId)
+    //         ->where("norekcrd", $id)
+    //         ->get();
+
+    //     $transformedData = $data->map(function ($item) {
+    //         if (2000 > intval(date("Y", strtotime($item->tglbyr)))) {
+    //             return [
+    //                 'term' => $item->periode,
+    //                 'amount' => $this->formatNumber($item->totalangsuran),
+    //                 'loanID' => $item->norekcrd,
+    //                 'principalAmount' => $this->formatNumber($item->tagpokok),
+    //                 'interestAmount' => $this->formatNumber($item->tagbunga),
+    //                 'penaltyAmount' => $this->formatNumber($item->tagdenda),
+    //                 'repaymentDate' => "-"
+    //             ];
+    //         }
+    //     })->filter()->values();
+
+    //     $originalArray = json_decode($transformedData, true);
+
+    //     return $this->sendResponse($originalArray, 'Loan successfully');
+    // }
 
     public function findLoanProductType(): JsonResponse
     {
@@ -155,11 +222,11 @@ class LoanApiController extends BaseController
 
         $tenant = TenantsModel::where('id', $user->tenant_id)->first();
         $dsn = $tenant->core_database_dsn;
-        
+
         $data = $this->sqlServerConnection($dsn)->table("crd_setup")
-        ->where('kodeprodukcrd', 01)
-        ->select('kodeprodukcrd', 'namafull')
-        ->get();
+            ->where('kodeprodukcrd', 01)
+            ->select('kodeprodukcrd', 'namafull')
+            ->get();
 
         $modifiedData = [];
         foreach ($data as $item) {
@@ -195,8 +262,8 @@ class LoanApiController extends BaseController
         $dsn = $tenant->core_database_dsn;
 
         $datas = $this->sqlServerConnection($dsn)->table("crd_setup")
-        ->select('kodeprodukcrd', 'namafull')
-        ->get();
+            ->select('kodeprodukcrd', 'namafull')
+            ->get();
 
         $selectedProduct = null;
         foreach ($datas as $data) {
@@ -216,7 +283,7 @@ class LoanApiController extends BaseController
             'Jumlah' => "Rp. " . number_format($request->currentBalance, 0, ',', '.'),
             'Jangka Waktu' => $request->period . " Bulan"
         ]);
-        
+
         $parent = "03" . $loan->id;
 
         $this->sendNotification($title, $description, 0, $user->id, $user->id, $parent);
@@ -230,8 +297,8 @@ class LoanApiController extends BaseController
 
         $data = new TransactionsModel();
 
-        $uuid = Uuid::uuid4()->toString(); 
-        
+        $uuid = Uuid::uuid4()->toString();
+
         $data->id = $uuid;
         $data->local_id = $uuid;
         $data->batch_id = 'mobile';
@@ -256,7 +323,7 @@ class LoanApiController extends BaseController
             'Nama Pengirim' => $request->recipient,
             'Jumlah' => "Rp. " . number_format($request->amount, 0, ',', '.')
         ]);
-        
+
         $parent = "07" . $data->id;
 
         $this->sendNotification($title, $description, 0, $user->id, $user->id, $parent);
@@ -288,7 +355,7 @@ class LoanApiController extends BaseController
             'Alasan' => $request->reason,
             'Jumlah' => "Rp. " . number_format($request->amount, 0, ',', '.')
         ]);
-        
+
         $parent = "05" . $data->id;
 
         $this->sendNotification($title, $description, 0, $user->id, $user->id, $parent);

@@ -119,12 +119,12 @@ class ReservationApiController extends BaseController
             $user->password = password_hash($userData['username'], PASSWORD_DEFAULT, ['cost' => 4]);
             $user->username = $userData['username'];
             $user->first_name = $userData['name'];
-            $user->client_type = "API";
+            $user->client_type = "ADMIN";
             $user->tenant_id = $userData['public_id'];
             // $user->account_officer_id = $userData['kode_ao'];
             // $user->branch_id = sprintf("%03d", $userData['branch_id']);
             $user->branch_id = "001";
-            $user->pwd = password_verify($userData['pwd1'], $userData['pwd2']);
+            // $user->pwd = password_verify($userData['pwd1'], $userData['pwd2']);
             
             // $connection->table('users')->insert((array) $user);
 

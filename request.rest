@@ -1,13 +1,14 @@
 @url = http://192.168.18.100:8000/api
-@token = 941|Evmg0EjwxkXIU384kIuwzdQQ7dl3krMCHQJUaWjq20591ce6
+# @url = https://mobile-customer.dotsco.re/api
+@token = 97|2Le6WgR1Momk18yYuBEKAHlBeqUXCW30U7hNaNVT5c667c65
 ### ===
 POST {{url}}/login
 Content-Type: application/json
- API
+ 
 {
-    "username" : "ibu3",
+    "username" : "user",
     "password" : "password123",
-    "tenantID" : "ksp_spr",
+    "tenantID" : "ksp_mrn",
     "clientType" : "CUSTOMER"
 }
 
@@ -66,7 +67,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### ===
-GET {{url}}/saving/history/00102020000009
+GET {{url}}/saving/history/00102010000572
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -107,13 +108,13 @@ GET {{url}}/loan/product-type
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-### ===
-GET {{url}}/loan/bill/00104010000745
+### === Belakang
+GET {{url}}/loan/bill/00104010001239
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-### ===
-GET {{url}}/loan/now/00104010000745
+### === Depan
+GET {{url}}/loan/now/00104010001239
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -176,7 +177,6 @@ Authorization: Bearer {{token}}
     "currentBalance" : "200000"
 }
 
-### ===
 GET {{url}}/notification
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -214,25 +214,21 @@ Content-Type: application/json
 {
     "data": [
     {
-        "public_id": "8",
-        "name": "KSP Sinar Mas Kalimantan API",
-        "username": "jaya-abadi",
+        "public_id": "5",
+        "name": "BPR Sukma",
+        "username": "sukmajaya",
         "token": "",
         "Kode AO": "1",
         "database": "ksp_sinarmas_kalimantan",
-        "pwd1": "jaya-abadi",
-        "pwd2": "$2y$04$Mfwjc1LgRhtU0Z2aP1Oewu6BFSjoHKbsV9Vrd1i01\/ovNSK5NT6Gm"
+        "pwd1": "sukmajaya",
+        "pwd2": "$2y$04$PnE4zyW0AoIy\/0xqWoDF7.IZM.SLcysLKi7szJaMOzg68n6\/JPN4q"
     }
 ]
 }
 
 ### 
-POST https://dots-api-test.dotsco.re/auth/login
+GET {{url}}/check-token
 Content-Type: application/json
 
-{
-    "username": "jaya-abadi",
-    "password": "jaya-abadi",
-    "tenantID": "ksp_ja",
-    "clientType": "API"
-}
+### ===
+GET {{url}}/topup-reason

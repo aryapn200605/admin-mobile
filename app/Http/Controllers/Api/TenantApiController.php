@@ -79,4 +79,50 @@ class TenantApiController extends BaseController
 
         return $this->sendResponse($modifiedData, 'Sukses mengambil payment method');
     }
+
+    public function topupReason() : JsonResponse
+    {
+        $data = [
+            "Pembelian Barang Konsumtif",
+            "Pendidikan",
+            "Properti",
+            "Kendaraan",
+            "Renovasi Rumah",
+            "Modal Usaha",
+            "Krisis Keuangan Mendesak",
+            "Konsolidasi Utang",
+            "Pengeluaran Tak Terduga",
+            "Investasi",
+            "Kesehatan dan Biaya Medis",
+            "Liburan dan Rekreasi",
+            "Pernikahan",
+            "Pembiayaan Perjalanan",
+            "Pembiayaan Kegiatan Hiburan",
+            "Pemenuhan Kebutuhan Sehari-hari",
+            "Biaya Pindah atau Relokasi",
+            "Pembiayaan Teknologi dan Gadget",
+            "Biaya Hobi atau Koleksi",
+            "Pembiayaan Acara Khusus",
+            "Perbaikan Darurat Rumah Tangga",
+            "Biaya Pekerjaan atau Pelatihan",
+            "Pembiayaan Kesejahteraan Hewan Peliharaan",
+            "Pembelian Barang Mewah",
+            "Biaya Adopsi atau Fertilisasi In Vitro",
+            "Pembayaran Pajak atau Hutang Fiskal",
+            "Pembayaran Asuransi",
+            "Pembiayaan Dana Darurat",
+            "Pembiayaan Proyek Seni atau Kreatif",
+            "Pembelian Saham atau Investasi Keuangan",
+            "Lainnya..."
+        ];
+
+        $result = collect($data)->map(function ($alasan) {
+            return [
+                'value' => $alasan,
+                'label' => $alasan,
+            ];
+        });
+
+        return $this->sendResponse($result, "sukses");
+    }
 }
